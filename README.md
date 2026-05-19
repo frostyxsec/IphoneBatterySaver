@@ -62,9 +62,8 @@ Respring/restart dilakukan **secara manual** oleh pengguna, sehingga kamu punya 
 ### 1. Clone atau download script
 
 ```bash
-# Clone repo
-git clone https://github.com/frostyxsec/IphoneBatterySaver
-cd battery-tweak
+# Simpan file x.sh di
+/var/jb/var/root atau path root masing masing
 ```
 
 ### 2. Beri izin eksekusi
@@ -76,7 +75,7 @@ chmod +x x.sh
 ### 3. Jalankan dengan sudo
 
 ```bash
-sudo bash x.sh
+sudo bash x.sh / ./x.sh
 ```
 
 ### 4. Pilih menu

@@ -63,20 +63,20 @@ Respring/restart dilakukan **secara manual** oleh pengguna, sehingga kamu punya 
 
 ```bash
 # Clone repo
-git clone https://github.com/username/battery-tweak.git
+git clone https://github.com/frostyxsec/IphoneBatterySaver
 cd battery-tweak
 ```
 
 ### 2. Beri izin eksekusi
 
 ```bash
-chmod +x battery_tweak.sh
+chmod +x x.sh
 ```
 
 ### 3. Jalankan dengan sudo
 
 ```bash
-sudo bash battery_tweak.sh
+sudo bash x.sh
 ```
 
 ### 4. Pilih menu
@@ -153,7 +153,7 @@ sudo launchctl bootstrap system /System/Library/LaunchDaemons/com.apple.siriinfe
 
 ```
 battery-tweak/
-├── battery_tweak.sh    # Script utama
+├── x.sh    # Script utama
 └── README.md           # Dokumentasi ini
 ```
 

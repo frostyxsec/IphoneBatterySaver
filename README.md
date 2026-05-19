@@ -1,239 +1,190 @@
-#!/bin/bash
+# ⚡ Battery Tweak — macOS Service Manager
 
-# ============================================================
-#   BATTERY TWEAK - macOS Service Manager
-#   Author  : Frosty
-#   Version : 1.0.0
-# ============================================================
+> Script shell bash untuk mengoptimalkan baterai macOS dengan menonaktifkan background service yang tidak diperlukan.
 
-# ── Colors ──────────────────────────────────────────────────
-RESET='\033[0m'
-BOLD='\033[1m'
-DIM='\033[2m'
+---
 
-BLACK='\033[30m'
-RED='\033[31m'
-GREEN='\033[32m'
-YELLOW='\033[33m'
-BLUE='\033[34m'
-MAGENTA='\033[35m'
-CYAN='\033[36m'
-WHITE='\033[37m'
+## 📋 Deskripsi
 
-BG_BLACK='\033[40m'
-BG_GREEN='\033[42m'
-BG_RED='\033[41m'
-BG_YELLOW='\033[43m'
-BG_CYAN='\033[46m'
-BG_MAGENTA='\033[45m'
+**Battery Tweak** adalah tool CLI berbasis Bash yang memudahkan kamu untuk mengaktifkan atau menonaktifkan background service macOS yang tidak esensial — seperti Siri, Analytics, dan Assistant — guna menghemat daya baterai. Semua operasi dilakukan lewat menu interaktif dengan tampilan terminal yang bersih dan berwarna.
 
-# ── Services ─────────────────────────────────────────────────
-SERVICES=(
-  "com.apple.siriinferenced"
-  "com.apple.siriknowledged"
-  "com.apple.wifianalyticsd"
-  "com.apple.duetexpertd"
-  "com.apple.coreduetd"
-  "com.apple.analyticsd"
-  "com.apple.nanobackupd"
-  "com.apple.tipsd"
-  "com.apple.assistantd"
-)
+Respring/restart dilakukan **secara manual** oleh pengguna, sehingga kamu punya kendali penuh atas kapan perubahan diterapkan.
 
-SERVICE_LABELS=(
-  "Siri Inference"
-  "Siri Knowledge"
-  "WiFi Analytics"
-  "Duet Expert"
-  "Core Duet"
-  "Analytics"
-  "Nano Backup"
-  "Tips"
-  "Assistant"
-)
+---
 
-# ── Banner ────────────────────────────────────────────────────
-print_banner() {
-  clear
-  echo ""
-  echo -e "${BOLD}${CYAN}"
-  echo "  ██████╗  █████╗ ████████╗████████╗███████╗██████╗ ██╗   ██╗"
-  echo "  ██╔══██╗██╔══██╗╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗╚██╗ ██╔╝"
-  echo "  ██████╔╝███████║   ██║      ██║   █████╗  ██████╔╝ ╚████╔╝ "
-  echo "  ██╔══██╗██╔══██║   ██║      ██║   ██╔══╝  ██╔══██╗  ╚██╔╝  "
-  echo "  ██████╔╝██║  ██║   ██║      ██║   ███████╗██║  ██║   ██║   "
-  echo "  ╚═════╝ ╚═╝  ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝   ╚═╝   "
-  echo -e "${RESET}"
-  echo -e "  ${DIM}${WHITE}████████╗██╗    ██╗███████╗ █████╗ ██╗  ██╗${RESET}"
-  echo -e "  ${DIM}${WHITE}╚══██╔══╝██║    ██║██╔════╝██╔══██╗██║ ██╔╝${RESET}"
-  echo -e "  ${DIM}${WHITE}   ██║   ██║ █╗ ██║█████╗  ███████║█████╔╝ ${RESET}"
-  echo -e "  ${DIM}${WHITE}   ██║   ██║███╗██║██╔══╝  ██╔══██║██╔═██╗ ${RESET}"
-  echo -e "  ${DIM}${WHITE}   ██║   ╚███╔███╔╝███████╗██║  ██║██║  ██╗${RESET}"
-  echo -e "  ${DIM}${WHITE}   ╚═╝    ╚══╝╚══╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝${RESET}"
-  echo ""
-  echo -e "  ${DIM}${CYAN}╔══════════════════════════════════════════════════════════╗${RESET}"
-  echo -e "  ${DIM}${CYAN}║${RESET}  ${BOLD}${YELLOW}⚡ macOS Battery Optimizer — Service Manager v1.0${RESET}       ${DIM}${CYAN}║${RESET}"
-  echo -e "  ${DIM}${CYAN}║${RESET}  ${DIM}${WHITE}Disable/Enable background services to save battery${RESET}      ${DIM}${CYAN}║${RESET}"
-  echo -e "  ${DIM}${CYAN}╚══════════════════════════════════════════════════════════╝${RESET}"
-  echo ""
-}
+## 🖥️ Preview
 
-# ── Divider ───────────────────────────────────────────────────
-print_divider() {
-  echo -e "  ${DIM}${CYAN}──────────────────────────────────────────────────────────${RESET}"
-}
+```
+  ██████╗  █████╗ ████████╗████████╗███████╗██████╗ ██╗   ██╗
+  ██╔══██╗██╔══██╗╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗╚██╗ ██╔╝
+  ██████╔╝███████║   ██║      ██║   █████╗  ██████╔╝ ╚████╔╝
+  ...
 
-# ── Status check per service ──────────────────────────────────
-get_service_status() {
-  local service="$1"
-  local result
-  result=$(sudo launchctl list "$service" 2>/dev/null)
-  if [ $? -eq 0 ]; then
-    echo "ON"
-  else
-    echo "OFF"
-  fi
-}
+  ╔══════════════════════════════════════════════════════════╗
+  ║  ⚡ macOS Battery Optimizer — Service Manager v1.0       ║
+  ║  Disable/Enable background services to save battery      ║
+  ╚══════════════════════════════════════════════════════════╝
 
-# ── Show service status table ─────────────────────────────────
-show_status() {
-  echo -e "  ${BOLD}${WHITE}SERVICE STATUS${RESET}"
-  print_divider
-  printf "  ${BOLD}%-4s %-24s %-18s %-6s${RESET}\n" "No." "Service" "Label" "Status"
-  print_divider
+  MENU UTAMA
+  ──────────────────────────────────────────────────────────
+   [1]  🔴  OFF   — Disable semua service (hemat baterai)
+   [2]  🟢  ON    — Enable semua service (kembalikan normal)
+   [3]  🔍  STATUS — Cek status service saat ini
+   [4]  ❌  KELUAR
+```
 
-  local i=0
-  for service in "${SERVICES[@]}"; do
-    local label="${SERVICE_LABELS[$i]}"
-    local status
-    status=$(get_service_status "$service")
+---
 
-    if [ "$status" = "ON" ]; then
-      printf "  ${DIM}%02d.${RESET}  %-24s %-18s " "$((i+1))" "$service" "$label"
-      echo -e "${BOLD}${GREEN}[  ON  ]${RESET}"
-    else
-      printf "  ${DIM}%02d.${RESET}  %-24s %-18s " "$((i+1))" "$service" "$label"
-      echo -e "${DIM}${RED}[ OFF  ]${RESET}"
-    fi
-    i=$((i+1))
-  done
-  print_divider
-}
+## ✨ Fitur
 
-# ── Disable all services (OFF) ────────────────────────────────
-disable_services() {
-  echo ""
-  echo -e "  ${BOLD}${RED}⛔  DISABLING SERVICES...${RESET}"
-  print_divider
+| Fitur | Keterangan |
+|---|---|
+| 🔴 **OFF Mode** | Disable semua service sekaligus dengan satu perintah |
+| 🟢 **ON Mode** | Enable kembali semua service ke kondisi normal |
+| 🔍 **Status View** | Tampilkan status tiap service (ON/OFF) secara real-time |
+| 🎨 **Colored UI** | Tampilan terminal berwarna dengan banner ASCII art |
+| 🔒 **Root Check** | Otomatis mendeteksi jika script tidak dijalankan sebagai root |
+| 🔁 **Manual Respring** | Tidak ada restart otomatis — pengguna mengontrol kapan reboot |
 
-  local i=0
-  for service in "${SERVICES[@]}"; do
-    local label="${SERVICE_LABELS[$i]}"
-    printf "  ${DIM}%-28s${RESET} → " "$label"
+---
 
-    sudo launchctl bootout system/"$service" 2>/dev/null
-    sudo launchctl disable system/"$service" 2>/dev/null
+## 🛠️ Persyaratan
 
-    echo -e "${BOLD}${RED}DISABLED${RESET}"
-    i=$((i+1))
-  done
+- macOS (diuji di macOS Ventura / Sonoma / Sequoia)
+- Terminal dengan dukungan warna ANSI
+- Akses `sudo` / root
+- `launchctl` (sudah tersedia bawaan macOS)
 
-  print_divider
-  echo ""
-  echo -e "  ${BOLD}${GREEN}✔  Semua service berhasil di-disable!${RESET}"
-  echo -e "  ${DIM}${YELLOW}⚠  Lakukan respring/restart manual untuk efek penuh.${RESET}"
-  echo ""
-}
+---
 
-# ── Enable all services (ON) ──────────────────────────────────
-enable_services() {
-  echo ""
-  echo -e "  ${BOLD}${GREEN}✅  ENABLING SERVICES...${RESET}"
-  print_divider
+## 🚀 Instalasi & Penggunaan
 
-  local i=0
-  for service in "${SERVICES[@]}"; do
-    local label="${SERVICE_LABELS[$i]}"
-    printf "  ${DIM}%-28s${RESET} → " "$label"
+### 1. Clone atau download script
 
-    sudo launchctl enable system/"$service" 2>/dev/null
-    sudo launchctl bootstrap system /System/Library/LaunchDaemons/"$service".plist 2>/dev/null
+```bash
+# Clone repo
+git clone https://github.com/username/battery-tweak.git
+cd battery-tweak
+```
 
-    echo -e "${BOLD}${GREEN}ENABLED${RESET}"
-    i=$((i+1))
-  done
+### 2. Beri izin eksekusi
 
-  print_divider
-  echo ""
-  echo -e "  ${BOLD}${GREEN}✔  Semua service berhasil di-enable!${RESET}"
-  echo -e "  ${DIM}${YELLOW}⚠  Lakukan respring/restart manual untuk efek penuh.${RESET}"
-  echo ""
-}
+```bash
+chmod +x battery_tweak.sh
+```
 
-# ── Menu ──────────────────────────────────────────────────────
-show_menu() {
-  echo -e "  ${BOLD}${WHITE}MENU UTAMA${RESET}"
-  print_divider
-  echo -e "  ${BOLD}${RED} [1]${RESET}  🔴  ${BOLD}OFF${RESET}  — Disable semua service (hemat baterai)"
-  echo -e "  ${BOLD}${GREEN} [2]${RESET}  🟢  ${BOLD}ON${RESET}   — Enable semua service (kembalikan normal)"
-  echo -e "  ${BOLD}${CYAN} [3]${RESET}  🔍  ${BOLD}STATUS${RESET} — Cek status service saat ini"
-  echo -e "  ${BOLD}${YELLOW} [4]${RESET}  ❌  ${BOLD}KELUAR${RESET}"
-  print_divider
-  echo ""
-  printf "  ${BOLD}${WHITE}Pilih menu ${CYAN}[1/2/3/4]${WHITE} → ${RESET}"
-}
+### 3. Jalankan dengan sudo
 
-# ── Check root ────────────────────────────────────────────────
-check_root() {
-  if [ "$EUID" -ne 0 ]; then
-    echo ""
-    echo -e "  ${BOLD}${RED}⚠  Script ini membutuhkan sudo / root.${RESET}"
-    echo -e "  ${DIM}${WHITE}Jalankan dengan: ${CYAN}sudo bash battery_tweak.sh${RESET}"
-    echo ""
-    exit 1
-  fi
-}
+```bash
+sudo bash battery_tweak.sh
+```
 
-# ── Main Loop ─────────────────────────────────────────────────
-main() {
-  check_root
+### 4. Pilih menu
 
-  while true; do
-    print_banner
-    show_menu
+```
+Pilih menu [1/2/3/4] →
+```
 
-    read -r choice
-    echo ""
+- Ketik `1` lalu Enter → **Disable** semua service
+- Ketik `2` lalu Enter → **Enable** semua service
+- Ketik `3` lalu Enter → **Lihat status** tiap service
+- Ketik `4` lalu Enter → **Keluar**
 
-    case "$choice" in
-      1)
-        disable_services
-        printf "  ${DIM}Tekan Enter untuk kembali ke menu...${RESET}"
-        read -r
-        ;;
-      2)
-        enable_services
-        printf "  ${DIM}Tekan Enter untuk kembali ke menu...${RESET}"
-        read -r
-        ;;
-      3)
-        print_banner
-        show_status
-        echo ""
-        printf "  ${DIM}Tekan Enter untuk kembali ke menu...${RESET}"
-        read -r
-        ;;
-      4)
-        echo -e "  ${BOLD}${CYAN}Bye! Jangan lupa respring manual jika perlu. ⚡${RESET}"
-        echo ""
-        exit 0
-        ;;
-      *)
-        echo -e "  ${RED}Pilihan tidak valid. Coba lagi.${RESET}"
-        sleep 1
-        ;;
-    esac
-  done
-}
+---
 
-main
+## ⚙️ Daftar Service yang Dikelola
+
+| No. | Service ID | Label |
+|---|---|---|
+| 01 | `com.apple.siriinferenced` | Siri Inference |
+| 02 | `com.apple.siriknowledged` | Siri Knowledge |
+| 03 | `com.apple.wifianalyticsd` | WiFi Analytics |
+| 04 | `com.apple.duetexpertd` | Duet Expert |
+| 05 | `com.apple.coreduetd` | Core Duet |
+| 06 | `com.apple.analyticsd` | Analytics |
+| 07 | `com.apple.nanobackupd` | Nano Backup |
+| 08 | `com.apple.tipsd` | Tips |
+| 09 | `com.apple.assistantd` | Assistant |
+
+---
+
+## 🔧 Cara Kerja
+
+### Mode OFF (Disable)
+
+Setiap service dimatikan menggunakan dua perintah `launchctl`:
+
+```bash
+sudo launchctl bootout system/com.apple.siriinferenced
+sudo launchctl disable system/com.apple.siriinferenced
+```
+
+- `bootout` → Menghentikan service yang sedang berjalan
+- `disable` → Mencegah service berjalan kembali setelah reboot
+
+### Mode ON (Enable)
+
+Service dikembalikan menggunakan:
+
+```bash
+sudo launchctl enable system/com.apple.siriinferenced
+sudo launchctl bootstrap system /System/Library/LaunchDaemons/com.apple.siriinferenced.plist
+```
+
+- `enable` → Mengizinkan service berjalan kembali
+- `bootstrap` → Menjalankan service dari plist-nya
+
+---
+
+## ⚠️ Catatan Penting
+
+> **Respring / Restart Manual**
+> Script ini **tidak melakukan restart otomatis**. Setelah menjalankan mode ON atau OFF, lakukan restart manual agar perubahan diterapkan secara penuh.
+
+> **SIP (System Integrity Protection)**
+> Beberapa service mungkin tidak dapat dinonaktifkan jika SIP aktif. Pastikan SIP dalam kondisi yang sesuai dengan kebutuhanmu sebelum menjalankan script ini.
+
+> **Risiko**
+> Menonaktifkan service seperti `assistantd` atau `siriinferenced` akan menonaktifkan fitur Siri. Gunakan mode ON untuk mengembalikan fungsionalitas tersebut kapan saja.
+
+---
+
+## 📂 Struktur Proyek
+
+```
+battery-tweak/
+├── battery_tweak.sh    # Script utama
+└── README.md           # Dokumentasi ini
+```
+
+---
+
+## 🔄 Changelog
+
+### v1.0.0
+- Rilis pertama
+- Fitur OFF / ON / STATUS
+- Banner ASCII art dengan warna ANSI
+- Root check otomatis
+- Manual respring (tidak ada auto-restart)
+
+---
+
+## 👤 Author
+
+**Frosty**
+- Script: `x.sh`
+- Platform: macOS / Linux
+- Versi: 1.0.0
+
+---
+
+## 📄 Lisensi
+
+Proyek ini bersifat open-source dan bebas digunakan untuk keperluan pribadi. Tidak ada garansi. Gunakan dengan risiko sendiri.
+
+---
+
+<div align="center">
+  <sub>⚡ Dibuat dengan ❤️ untuk menghemat baterai macOS</sub>
+</div>

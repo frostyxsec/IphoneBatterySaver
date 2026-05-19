@@ -1,12 +1,12 @@
-# ⚡ Battery Tweak — macOS Service Manager
+# ⚡ Battery Tweak — IPhone Service Manager
 
-> Script shell bash untuk mengoptimalkan baterai macOS dengan menonaktifkan background service yang tidak diperlukan.
+> Script shell bash untuk mengoptimalkan baterai IPhone dengan menonaktifkan background service yang tidak diperlukan.
 
 ---
 
 ## 📋 Deskripsi
 
-**Battery Tweak** adalah tool CLI berbasis Bash yang memudahkan kamu untuk mengaktifkan atau menonaktifkan background service macOS yang tidak esensial — seperti Siri, Analytics, dan Assistant — guna menghemat daya baterai. Semua operasi dilakukan lewat menu interaktif dengan tampilan terminal yang bersih dan berwarna.
+**Battery Tweak** adalah tool CLI berbasis Bash yang memudahkan kamu untuk mengaktifkan atau menonaktifkan background service IPhone yang tidak esensial — seperti Siri, Analytics, dan Assistant — guna menghemat daya baterai. Semua operasi dilakukan lewat menu interaktif dengan tampilan terminal yang bersih dan berwarna.
 
 Respring/restart dilakukan **secara manual** oleh pengguna, sehingga kamu punya kendali penuh atas kapan perubahan diterapkan.
 
@@ -21,7 +21,7 @@ Respring/restart dilakukan **secara manual** oleh pengguna, sehingga kamu punya 
   ...
 
   ╔══════════════════════════════════════════════════════════╗
-  ║  ⚡ macOS Battery Optimizer — Service Manager v1.0       ║
+  ║  ⚡ IPhone Battery Optimizer — Service Manager v1.0       ║
   ║  Disable/Enable background services to save battery      ║
   ╚══════════════════════════════════════════════════════════╝
 
@@ -50,10 +50,10 @@ Respring/restart dilakukan **secara manual** oleh pengguna, sehingga kamu punya 
 
 ## 🛠️ Persyaratan
 
-- macOS (diuji di macOS Ventura / Sonoma / Sequoia)
+- IPhone (diuji di IPhone Ventura / Sonoma / Sequoia)
 - Terminal dengan dukungan warna ANSI
 - Akses `sudo` / root
-- `launchctl` (sudah tersedia bawaan macOS)
+- `launchctl` (sudah tersedia bawaan IPhone)
 
 ---
 
@@ -174,7 +174,7 @@ battery-tweak/
 
 **Frosty**
 - Script: `x.sh`
-- Platform: macOS / Linux
+- Platform: IPhone / Linux
 - Versi: 1.0.0
 
 ---
@@ -186,5 +186,5 @@ Proyek ini bersifat open-source dan bebas digunakan untuk keperluan pribadi. Tid
 ---
 
 <div align="center">
-  <sub>⚡ Dibuat dengan ❤️ untuk menghemat baterai macOS</sub>
+  <sub>⚡ Dibuat dengan ❤️ untuk menghemat baterai IPhone</sub>
 </div>

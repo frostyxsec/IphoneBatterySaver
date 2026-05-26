@@ -2,7 +2,9 @@
 
 # ============================================================
 #   BATTERY TWEAK - macOS Service Manager
-#   Author  : Frosty
+#   Author  : Gede
+#   Version : 1.0.0
+# ============================================================
 
 # ── Colors ──────────────────────────────────────────────────
 RESET='\033[0m'
@@ -26,28 +28,25 @@ BG_CYAN='\033[46m'
 BG_MAGENTA='\033[45m'
 
 # ── Services ─────────────────────────────────────────────────
+# Format: "bundle_id|Label|Deskripsi singkat"
 SERVICES=(
-  "com.apple.siriinferenced"
-  "com.apple.siriknowledged"
-  "com.apple.wifianalyticsd"
-  "com.apple.duetexpertd"
-  "com.apple.coreduetd"
-  "com.apple.analyticsd"
-  "com.apple.nanobackupd"
-  "com.apple.tipsd"
-  "com.apple.assistantd"
-)
-
-SERVICE_LABELS=(
-  "Siri Inference"
-  "Siri Knowledge"
-  "WiFi Analytics"
-  "Duet Expert"
-  "Core Duet"
-  "Analytics"
-  "Nano Backup"
-  "Tips"
-  "Assistant"
+  "com.apple.siriinferenced|Siri Inference|Siri machine learning inference"
+  "com.apple.siriknowledged|Siri Knowledge|Siri knowledge & ML (cukup boros)"
+  "com.apple.assistantd|Assistant|Siri daemon utama"
+  "com.apple.relevanced|Relevance Engine|Suggestion & relevance engine"
+  "com.apple.wifianalyticsd|WiFi Analytics|Analitik jaringan WiFi"
+  "com.apple.duetexpertd|Duet Expert|Prediksi penggunaan aplikasi"
+  "com.apple.coreduetd|Core Duet|Smart battery & app usage tracking"
+  "com.apple.analyticsd|Analytics|Mengirim data analytics ke Apple"
+  "com.apple.nanobackupd|Nano Backup|Backup data nano/wearable"
+  "com.apple.tipsd|Tips|Daemon notifikasi Tips macOS"
+  "com.apple.ReportCrash|Report Crash|Mengumpulkan data crash di background"
+  "com.apple.crashreportcopymobile|Crash Copy Mobile|Menyalin log crash ke Apple"
+  "com.apple.DumpPanic|Dump Panic|Dump panic log (jarang dipakai)"
+  "com.apple.DumpBasebandCrash|Baseband Crash|Log crash modem/baseband"
+  "com.apple.mobile.softwareupdated|Software Update|Update OTA daemon"
+  "com.apple.OTATaskingAgent|OTA Tasking Agent|Tugas pembaruan OTA"
+  "com.apple.healthd|Health Daemon|Health app daemon (jika jarang dipakai)"
 )
 
 # ── Banner ────────────────────────────────────────────────────
@@ -84,8 +83,7 @@ print_divider() {
 # ── Status check per service ──────────────────────────────────
 get_service_status() {
   local service="$1"
-  local result
-  result=$(sudo launchctl list "$service" 2>/dev/null)
+  sudo launchctl list "$service" 2>/dev/null
   if [ $? -eq 0 ]; then
     echo "ON"
   else
@@ -97,21 +95,23 @@ get_service_status() {
 show_status() {
   echo -e "  ${BOLD}${WHITE}SERVICE STATUS${RESET}"
   print_divider
-  printf "  ${BOLD}%-4s %-24s %-18s %-6s${RESET}\n" "No." "Service" "Label" "Status"
+  printf "  ${BOLD}%-4s %-30s %-20s %-40s %-6s${RESET}\n" "No." "Bundle ID" "Label" "Deskripsi" "Status"
   print_divider
 
   local i=0
-  for service in "${SERVICES[@]}"; do
-    local label="${SERVICE_LABELS[$i]}"
-    local status
-    status=$(get_service_status "$service")
+  for entry in "${SERVICES[@]}"; do
+    local svc   label desc status
+    IFS='|' read -r svc label desc <<< "$entry"
+    status=$(get_service_status "$svc")
+
+    local desc_short="${desc:0:38}"
 
     if [ "$status" = "ON" ]; then
-      printf "  ${DIM}%02d.${RESET}  %-24s %-18s " "$((i+1))" "$service" "$label"
-      echo -e "${BOLD}${GREEN}[  ON  ]${RESET}"
+      printf "  ${DIM}%02d.${RESET}  %-30s %-20s %-40s " "$((i+1))" "$svc" "$label" "$desc_short"
+      echo -e "${BOLD}${GREEN}[ ON  ]${RESET}"
     else
-      printf "  ${DIM}%02d.${RESET}  %-24s %-18s " "$((i+1))" "$service" "$label"
-      echo -e "${DIM}${RED}[ OFF  ]${RESET}"
+      printf "  ${DIM}%02d.${RESET}  %-30s %-20s %-40s " "$((i+1))" "$svc" "$label" "$desc_short"
+      echo -e "${DIM}${RED}[ OFF ]${RESET}"
     fi
     i=$((i+1))
   done
@@ -125,12 +125,15 @@ disable_services() {
   print_divider
 
   local i=0
-  for service in "${SERVICES[@]}"; do
-    local label="${SERVICE_LABELS[$i]}"
-    printf "  ${DIM}%-28s${RESET} → " "$label"
+  for entry in "${SERVICES[@]}"; do
+    local svc label desc
+    IFS='|' read -r svc label desc <<< "$entry"
 
-    sudo launchctl bootout system/"$service" 2>/dev/null
-    sudo launchctl disable system/"$service" 2>/dev/null
+    printf "  ${DIM}%02d.${RESET} %-20s ${DIM}%s${RESET}\n" "$((i+1))" "$label" "$desc"
+    printf "      ${DIM}↳ ${CYAN}%s${RESET} → " "$svc"
+
+    sudo launchctl bootout system/"$svc" 2>/dev/null
+    sudo launchctl disable system/"$svc" 2>/dev/null
 
     echo -e "${BOLD}${RED}DISABLED${RESET}"
     i=$((i+1))
@@ -138,7 +141,7 @@ disable_services() {
 
   print_divider
   echo ""
-  echo -e "  ${BOLD}${GREEN}✔  Semua service berhasil di-disable!${RESET}"
+  echo -e "  ${BOLD}${GREEN}✔  Semua service berhasil di-disable! (${#SERVICES[@]} service)${RESET}"
   echo -e "  ${DIM}${YELLOW}⚠  Lakukan respring/restart manual untuk efek penuh.${RESET}"
   echo ""
 }
@@ -150,12 +153,15 @@ enable_services() {
   print_divider
 
   local i=0
-  for service in "${SERVICES[@]}"; do
-    local label="${SERVICE_LABELS[$i]}"
-    printf "  ${DIM}%-28s${RESET} → " "$label"
+  for entry in "${SERVICES[@]}"; do
+    local svc label desc
+    IFS='|' read -r svc label desc <<< "$entry"
 
-    sudo launchctl enable system/"$service" 2>/dev/null
-    sudo launchctl bootstrap system /System/Library/LaunchDaemons/"$service".plist 2>/dev/null
+    printf "  ${DIM}%02d.${RESET} %-20s ${DIM}%s${RESET}\n" "$((i+1))" "$label" "$desc"
+    printf "      ${DIM}↳ ${CYAN}%s${RESET} → " "$svc"
+
+    sudo launchctl enable system/"$svc" 2>/dev/null
+    sudo launchctl bootstrap system /System/Library/LaunchDaemons/"$svc".plist 2>/dev/null
 
     echo -e "${BOLD}${GREEN}ENABLED${RESET}"
     i=$((i+1))
@@ -163,7 +169,7 @@ enable_services() {
 
   print_divider
   echo ""
-  echo -e "  ${BOLD}${GREEN}✔  Semua service berhasil di-enable!${RESET}"
+  echo -e "  ${BOLD}${GREEN}✔  Semua service berhasil di-enable! (${#SERVICES[@]} service)${RESET}"
   echo -e "  ${DIM}${YELLOW}⚠  Lakukan respring/restart manual untuk efek penuh.${RESET}"
   echo ""
 }

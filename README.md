@@ -1,12 +1,12 @@
-# ⚡ Battery Tweak — IPhone Service Manager
+# ⚡ Battery Tweak — macOS Service Manager
 
-> Script shell bash untuk mengoptimalkan baterai IPhone dengan menonaktifkan background service yang tidak diperlukan.
+> Script shell bash untuk mengoptimalkan baterai macOS dengan menonaktifkan background service yang tidak diperlukan.
 
 ---
 
 ## 📋 Deskripsi
 
-**Battery Tweak** adalah tool CLI berbasis Bash yang memudahkan kamu untuk mengaktifkan atau menonaktifkan background service IPhone yang tidak esensial — seperti Siri, Analytics, dan Assistant — guna menghemat daya baterai. Semua operasi dilakukan lewat menu interaktif dengan tampilan terminal yang bersih dan berwarna.
+**Battery Tweak** adalah tool CLI berbasis Bash yang memudahkan kamu untuk mengaktifkan atau menonaktifkan background service macOS yang tidak esensial — seperti Siri, Analytics, dan Assistant — guna menghemat daya baterai. Semua operasi dilakukan lewat menu interaktif dengan tampilan terminal yang bersih dan berwarna.
 
 Respring/restart dilakukan **secara manual** oleh pengguna, sehingga kamu punya kendali penuh atas kapan perubahan diterapkan.
 
@@ -21,7 +21,7 @@ Respring/restart dilakukan **secara manual** oleh pengguna, sehingga kamu punya 
   ...
 
   ╔══════════════════════════════════════════════════════════╗
-  ║  ⚡ IPhone Battery Optimizer — Service Manager v1.0       ║
+  ║  ⚡ macOS Battery Optimizer — Service Manager v1.0       ║
   ║  Disable/Enable background services to save battery      ║
   ╚══════════════════════════════════════════════════════════╝
 
@@ -50,10 +50,10 @@ Respring/restart dilakukan **secara manual** oleh pengguna, sehingga kamu punya 
 
 ## 🛠️ Persyaratan
 
-- IPhone (diuji di IPhone Ventura / Sonoma / Sequoia)
+- macOS (diuji di macOS Ventura / Sonoma / Sequoia)
 - Terminal dengan dukungan warna ANSI
 - Akses `sudo` / root
-- `launchctl` (sudah tersedia bawaan IPhone)
+- `launchctl` (sudah tersedia bawaan macOS)
 
 ---
 
@@ -62,8 +62,9 @@ Respring/restart dilakukan **secara manual** oleh pengguna, sehingga kamu punya 
 ### 1. Clone atau download script
 
 ```bash
-# Simpan file x.sh di
-/var/jb/var/root atau path root masing masing
+# Clone repo
+git clone https://github.com/username/battery-tweak.git
+cd battery-tweak
 ```
 
 ### 2. Beri izin eksekusi
@@ -75,7 +76,7 @@ chmod +x x.sh
 ### 3. Jalankan dengan sudo
 
 ```bash
-sudo bash x.sh / ./x.sh
+sudo bash x.sh
 ```
 
 ### 4. Pilih menu
@@ -93,17 +94,25 @@ Pilih menu [1/2/3/4] →
 
 ## ⚙️ Daftar Service yang Dikelola
 
-| No. | Service ID | Label |
-|---|---|---|
-| 01 | `com.apple.siriinferenced` | Siri Inference |
-| 02 | `com.apple.siriknowledged` | Siri Knowledge |
-| 03 | `com.apple.wifianalyticsd` | WiFi Analytics |
-| 04 | `com.apple.duetexpertd` | Duet Expert |
-| 05 | `com.apple.coreduetd` | Core Duet |
-| 06 | `com.apple.analyticsd` | Analytics |
-| 07 | `com.apple.nanobackupd` | Nano Backup |
-| 08 | `com.apple.tipsd` | Tips |
-| 09 | `com.apple.assistantd` | Assistant |
+| No. | Service ID | Label | Deskripsi |
+|---|---|---|---|
+| 01 | `com.apple.siriinferenced` | Siri Inference | Siri machine learning inference |
+| 02 | `com.apple.siriknowledged` | Siri Knowledge | Siri knowledge & ML (cukup boros) |
+| 03 | `com.apple.assistantd` | Assistant | Siri daemon utama |
+| 04 | `com.apple.relevanced` | Relevance Engine | Suggestion & relevance engine |
+| 05 | `com.apple.wifianalyticsd` | WiFi Analytics | Analitik jaringan WiFi |
+| 06 | `com.apple.duetexpertd` | Duet Expert | Prediksi penggunaan aplikasi |
+| 07 | `com.apple.coreduetd` | Core Duet | Smart battery & app usage tracking |
+| 08 | `com.apple.analyticsd` | Analytics | Mengirim data analytics ke Apple |
+| 09 | `com.apple.nanobackupd` | Nano Backup | Backup data nano/wearable |
+| 10 | `com.apple.tipsd` | Tips | Daemon notifikasi Tips macOS |
+| 11 | `com.apple.ReportCrash` | Report Crash | Mengumpulkan data crash di background |
+| 12 | `com.apple.crashreportcopymobile` | Crash Copy Mobile | Menyalin log crash ke Apple |
+| 13 | `com.apple.DumpPanic` | Dump Panic | Dump panic log (jarang dipakai) |
+| 14 | `com.apple.DumpBasebandCrash` | Baseband Crash | Log crash modem/baseband |
+| 15 | `com.apple.mobile.softwareupdated` | Software Update | Update OTA daemon |
+| 16 | `com.apple.OTATaskingAgent` | OTA Tasking Agent | Tugas pembaruan OTA |
+| 17 | `com.apple.healthd` | Health Daemon | Health app daemon (jika jarang dipakai) |
 
 ---
 
@@ -160,6 +169,12 @@ battery-tweak/
 
 ## 🔄 Changelog
 
+### v1.1.0
+- Tambah 8 service baru: ReportCrash, CrashReportCopyMobile, DumpPanic, DumpBasebandCrash, SoftwareUpdated, OTATaskingAgent, Relevanced, HealthD
+- Tampilan disable/enable sekarang menampilkan deskripsi tiap service
+- Refactor array service ke format `bundle_id|label|deskripsi` (lebih mudah dikembangkan)
+- Tabel STATUS kini memiliki kolom Deskripsi
+
 ### v1.0.0
 - Rilis pertama
 - Fitur OFF / ON / STATUS
@@ -173,7 +188,7 @@ battery-tweak/
 
 **Frosty**
 - Script: `x.sh`
-- Platform: IPhone / Linux
+- Platform: macOS
 - Versi: 1.0.0
 
 ---
@@ -185,5 +200,5 @@ Proyek ini bersifat open-source dan bebas digunakan untuk keperluan pribadi. Tid
 ---
 
 <div align="center">
-  <sub>⚡ Dibuat dengan ❤️ untuk menghemat baterai IPhone</sub>
+  <sub>⚡ Dibuat dengan ❤️ untuk menghemat baterai macOS</sub>
 </div>

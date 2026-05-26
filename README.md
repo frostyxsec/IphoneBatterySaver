@@ -59,27 +59,19 @@ Respring/restart dilakukan **secara manual** oleh pengguna, sehingga kamu punya 
 
 ## 🚀 Instalasi & Penggunaan
 
-### 1. Clone atau download script
-
-```bash
-# Clone repo
-git clone https://github.com/username/battery-tweak.git
-cd battery-tweak
-```
-
-### 2. Beri izin eksekusi
+### 1. Beri izin eksekusi
 
 ```bash
 chmod +x x.sh
 ```
 
-### 3. Jalankan dengan sudo
+### 2. Jalankan dengan sudo
 
 ```bash
 sudo bash x.sh
 ```
 
-### 4. Pilih menu
+### 3. Pilih menu
 
 ```
 Pilih menu [1/2/3/4] →

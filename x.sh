@@ -39,7 +39,6 @@ SERVICES=(
   "com.apple.coreduetd|Core Duet|Smart battery & app usage tracking"
   "com.apple.analyticsd|Analytics|Mengirim data analytics ke Apple"
   "com.apple.nanobackupd|Nano Backup|Backup data nano/wearable"
-  "com.apple.tipsd|Tips|Daemon notifikasi Tips macOS"
   "com.apple.ReportCrash|Report Crash|Mengumpulkan data crash di background"
   "com.apple.crashreportcopymobile|Crash Copy Mobile|Menyalin log crash ke Apple"
   "com.apple.DumpPanic|Dump Panic|Dump panic log (jarang dipakai)"
